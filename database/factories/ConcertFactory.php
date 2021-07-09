@@ -8,18 +8,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ConcertFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Concert::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
     public function definition()
     {
         return [
@@ -34,5 +24,23 @@ class ConcertFactory extends Factory
             'zip' => '17916',
             'additional_information' => 'Some sample additional information.'
         ];
+    }
+
+    public function published()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'published_at' => Carbon::parse('-1 weeks'),
+            ];
+        });
+    }
+
+    public function unpublished()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'published_at' => null,
+            ];
+        });
     }
 }
