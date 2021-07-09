@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Exceptions\NotEnoughTicketsException;
 use App\Models\Concert;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,10 +55,66 @@ class ConcertTest extends TestCase
     function test_can_order_concert_tickets()
     {
         $concert = Concert::factory()->create();
+        $concert->addTickets(3);
 
         $order = $concert->orderTickets('jane@example.com', 3);
 
         $this->assertEquals('jane@example.com', $order->email);
         $this->assertEquals(3, $order->tickets->count());
+    }
+
+
+    function test_can_add_tickets()
+    {
+        $concert = Concert::factory()->create();
+        $concert->addTickets(50);
+
+        $this->assertEquals(50, $concert->ticketsRemaining());
+    }
+
+    function test_tickets_remain_does_not_include_tickets_associated_with_an_order()
+    {
+        $concert = Concert::factory()->create();
+        $concert->addTickets(50);
+        $concert->orderTickets('jane@example.com', 30);
+
+
+        $this->assertEquals(20, $concert->ticketsRemaining());
+    }
+
+    function test_trying_to_purchase_more_tickets_than_remain()
+    {
+        $concert = Concert::factory()->create();
+        $concert->addTickets(10);
+
+        try {
+            $concert->orderTickets('jane@example.com', 11);
+        } catch (NotEnoughTicketsException $e) {
+            $order = $concert->orders()->where('email', 'jane@example.com')->first();
+            $this->assertEquals(10, $concert->ticketsRemaining());
+            $this->assertNull($order);
+            return;
+        }
+
+        $this->fail('Order succeeded even though there were not enough tickets remaining.');
+    }
+
+    function test_cannot_order_tickets_that_have_already_purchased()
+    {
+        $concert = Concert::factory()->create();
+        $concert->addTickets(10);
+
+        $concert->orderTickets('jane@example.com', 8);
+
+        try {
+            $concert->orderTickets('john@example.com', 3);
+        } catch (NotEnoughTicketsException $e) {
+            $johnOrder = $concert->orders()->where('email', 'john@example.com')->first();
+            $this->assertEquals(2, $concert->ticketsRemaining());
+            $this->assertNull($johnOrder);
+            return;
+        }
+
+        $this->fail('Order succeeded even though there were not enough tickets remaining.');
     }
 }
