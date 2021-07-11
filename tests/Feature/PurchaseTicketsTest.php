@@ -6,6 +6,7 @@ use App\Billing\FakePaymentGateway;
 use App\Billing\PaymentGateway;
 use App\Models\Concert;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 class PurchaseTicketsTest extends TestCase
@@ -42,9 +43,14 @@ class PurchaseTicketsTest extends TestCase
 		]);
 
 		$response->assertStatus(201);
+		$response->assertJson(
+			fn (AssertableJson $json) =>
+			$json->where('email', 'john@example.com')
+				->where('ticket_quantity', 3)
+				->where('amount', 9750)
+		);
 
 		$this->assertEquals(9750, $this->paymentGateway->totalCharges());
-
 		$this->assertTrue($concert->hasOrderFor('john@example.com'));
 		$this->assertEquals(3, $concert->ordersFor('john@example.com')->first()->ticketQuantity());
 	}
