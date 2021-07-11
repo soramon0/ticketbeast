@@ -54,19 +54,19 @@ class ConcertTest extends TestCase
 
     function test_can_order_concert_tickets()
     {
-        $concert = Concert::factory()->create();
-        $concert->addTickets(3);
+        $concert = Concert::factory()->create()->addTickets(3);
 
         $order = $concert->orderTickets('jane@example.com', 3);
 
         $this->assertEquals('jane@example.com', $order->email);
-        $this->assertEquals(3, $order->tickets->count());
+        $this->assertEquals(3, $order->ticketQuantity());
     }
 
 
     function test_can_add_tickets()
     {
         $concert = Concert::factory()->create();
+
         $concert->addTickets(50);
 
         $this->assertEquals(50, $concert->ticketsRemaining());
@@ -74,25 +74,22 @@ class ConcertTest extends TestCase
 
     function test_tickets_remain_does_not_include_tickets_associated_with_an_order()
     {
-        $concert = Concert::factory()->create();
-        $concert->addTickets(50);
-        $concert->orderTickets('jane@example.com', 30);
+        $concert = Concert::factory()->create()->addTickets(50);
 
+        $concert->orderTickets('jane@example.com', 30);
 
         $this->assertEquals(20, $concert->ticketsRemaining());
     }
 
-    function test_trying_to_purchase_more_tickets_than_remain()
+    function test_trying_to_purchase_more_tickets_than_remain_throws_an_exception()
     {
-        $concert = Concert::factory()->create();
-        $concert->addTickets(10);
+        $concert = Concert::factory()->create()->addTickets(10);
 
         try {
             $concert->orderTickets('jane@example.com', 11);
         } catch (NotEnoughTicketsException $e) {
-            $order = $concert->orders()->where('email', 'jane@example.com')->first();
+            $this->assertFalse($concert->hasOrderFor('jane@example.com'));
             $this->assertEquals(10, $concert->ticketsRemaining());
-            $this->assertNull($order);
             return;
         }
 
@@ -101,17 +98,15 @@ class ConcertTest extends TestCase
 
     function test_cannot_order_tickets_that_have_already_purchased()
     {
-        $concert = Concert::factory()->create();
-        $concert->addTickets(10);
+        $concert = Concert::factory()->create()->addTickets(10);
 
         $concert->orderTickets('jane@example.com', 8);
 
         try {
             $concert->orderTickets('john@example.com', 3);
         } catch (NotEnoughTicketsException $e) {
-            $johnOrder = $concert->orders()->where('email', 'john@example.com')->first();
+            $this->assertFalse($concert->hasOrderFor('john@example.com'));
             $this->assertEquals(2, $concert->ticketsRemaining());
-            $this->assertNull($johnOrder);
             return;
         }
 

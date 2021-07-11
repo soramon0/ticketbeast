@@ -13,8 +13,7 @@ class OrderTest extends TestCase
 
     public function test_tickets_are_released_when_an_order_is_cancelled()
     {
-        $concert = Concert::factory()->published()->create();
-        $concert->addTickets(10);
+        $concert = Concert::factory()->create()->addTickets(10);
         $order = $concert->orderTickets('jane@example.com', 5);
         $this->assertEquals(5, $concert->ticketsRemaining());
 
