@@ -15,4 +15,9 @@ class Ticket extends Model
     {
         return $query->whereNull('order_id');
     }
+
+    public function release()
+    {
+        $this->update(['order_id' => null]);
+    }
 }
