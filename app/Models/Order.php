@@ -38,11 +38,10 @@ class Order extends Model
 
     public function toArray()
     {
-        $quantity = $this->ticketQuantity();
         return [
             'email' => $this->email,
-            'ticket_quantity' => $quantity,
-            'amount' => $quantity * $this->concert->ticket_price,
+            'ticket_quantity' => $this->ticketQuantity(),
+            'amount' => $this->amount,
         ];
     }
 }

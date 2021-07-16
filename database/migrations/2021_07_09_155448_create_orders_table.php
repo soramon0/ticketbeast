@@ -18,6 +18,7 @@ class CreateOrdersTable extends Migration
             $table->timestamps();
             $table->foreignId('concert_id');
             $table->string('email');
+            $table->integer('amount');
         });
     }
 
