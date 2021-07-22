@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Lib\Reservation;
+use App\Models\Ticket;
 use Tests\TestCase;
 
 class ReservationTest extends TestCase
@@ -18,5 +19,21 @@ class ReservationTest extends TestCase
 		$reservation = new Reservation($tickets);
 
 		$this->assertEquals(3600, $reservation->totalCost());
+	}
+
+	public function test_reserved_tickets_are_released_when_a_reservation_is_cancelled()
+	{
+		$tickets = collect([
+			$this->spy(Ticket::class),
+			$this->spy(Ticket::class),
+			$this->spy(Ticket::class),
+		]);
+		$reservation = new Reservation($tickets);
+
+		$reservation->cancel();
+
+		foreach ($tickets as $ticket) {
+			$ticket->shouldHaveReceived('release');
+		}
 	}
 }
