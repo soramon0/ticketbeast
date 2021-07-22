@@ -1,0 +1,25 @@
+version: "3.1"
+
+services:
+    db:
+        image: mysql:latest
+        command: --default-authentication-plugin=mysql_native_password
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ticketbeast
+            MYSQL_USER: ticketbeast_user
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: example
+        ports:
+            - 3306:3306
+        volumes:
+            - ticketbeast:/var/lib/mysql
+
+    adminer:
+        image: adminer
+        restart: unless-stopped
+        ports:
+            - 8080:8080
+
+volumes:
+    ticketbeast:
