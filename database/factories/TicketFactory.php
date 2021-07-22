@@ -17,4 +17,13 @@ class TicketFactory extends Factory
 			'concert_id' => User::factory(),
 		];
 	}
+
+	public function reserved()
+	{
+		return $this->state(function (array $attributes) {
+			return [
+				'reserved_at' => Carbon::now(),
+			];
+		});
+	}
 }

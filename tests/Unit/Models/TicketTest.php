@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Concert;
 use App\Models\Ticket;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,13 +24,11 @@ class TicketTest extends TestCase
 
     public function test_a_ticket_can_be_released()
     {
-        $concert = Concert::factory()->create()->addTickets(1);
-        $order = $concert->orderTickets('jane@example.com', 1);
-        $ticket = $order->tickets()->first();
-        $this->assertEquals($order->id, $ticket->order_id);
+        $ticket = Ticket::factory()->reserved()->create();
+        $this->assertNotNull($ticket->reserved_at);
 
         $ticket->release();
 
-        $this->assertNull($ticket->fresh()->order_id);
+        $this->assertNull($ticket->fresh()->reserved_at);
     }
 }
