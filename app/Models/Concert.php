@@ -49,13 +49,13 @@ class Concert extends Model
         return $this->createOrder($email, $tickets);
     }
 
-    public function reserveTickets(Int $quantity): Reservation
+    public function reserveTickets(Int $quantity, String $email): Reservation
     {
         $tickets = $this->findTickets($quantity)->each(function ($ticket) {
             $ticket->reserve();
         });
 
-        return new Reservation($tickets);
+        return new Reservation($tickets, $email);
     }
 
     public function findTickets($quantity)
