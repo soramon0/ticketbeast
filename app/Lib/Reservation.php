@@ -2,6 +2,7 @@
 
 namespace App\Lib;
 
+use App\Billing\PaymentGateway;
 use App\Models\Order;
 
 class Reservation
@@ -30,8 +31,9 @@ class Reservation
 		return $this->email;
 	}
 
-	public function complete()
+	public function complete(PaymentGateway $paymentGateway, String $paymentToken)
 	{
+		$paymentGateway->charge($this->totalCost(), $paymentToken);
 		return Order::forTickets($this->tickets(), $this->email(), $this->totalCost());
 	}
 
