@@ -17,7 +17,6 @@ class ConcertOrdersController extends Controller
         $this->paymentGateway = $paymentGateway;
     }
 
-
     function store($concertId)
     {
         $concert = Concert::published()->findOrFail($concertId);
