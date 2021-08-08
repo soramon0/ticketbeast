@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Lib;
 
 use App\Billing\FakePaymentGateway;
 use App\Lib\Reservation;
