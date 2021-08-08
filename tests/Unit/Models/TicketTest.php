@@ -2,9 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Models\Concert;
 use App\Models\Ticket;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
